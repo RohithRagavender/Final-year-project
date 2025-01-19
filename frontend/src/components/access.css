@@ -1,0 +1,61 @@
+
+body {
+    font-family: 'Inter', sans-serif; /* Use a modern font */
+    color: #2c3e50; /* Darker text for better contrast */
+    background-color: #f9f9f9; /* Softer background color */
+    margin: 0;
+    padding: 0;
+    line-height: 1.6; /* Improve readability */
+  }
+  
+  button {
+    font-size: 1rem; /* Use responsive font size */
+    padding: 12px 20px; /* Modern spacing */
+    margin: 10px 0;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px; /* Rounded corners for modern feel */
+    background-color: #3498db; /* Modern blue button */
+    color: #fff;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Add smooth effects */
+  }
+  
+  button:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+    transform: translateY(-3px); /* Subtle lift on hover */
+  }
+  
+  button:focus {
+    outline: 3px solid #2ecc71; /* Accessibility focus state */
+    outline-offset: 2px;
+  }
+  
+  /* High Contrast Mode */
+  .high-contrast {
+    color: #fff;
+    background-color: #1a1a1a; /* Sleeker black */
+  }
+  
+  .high-contrast button {
+    background-color: #1a1a1a;
+    color: #fff;
+    border: 2px solid #fff;
+  }
+  
+  .high-contrast button:hover {
+    background-color: #333; /* Slightly lighter black */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    body {
+      padding: 10px; /* Add padding for smaller screens */
+    }
+  
+    button {
+      width: 100%; /* Full-width buttons for small screens */
+      padding: 15px; /* Larger tap target */
+    }
+  }
+ 
+  

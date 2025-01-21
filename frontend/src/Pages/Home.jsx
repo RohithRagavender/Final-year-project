@@ -10,6 +10,15 @@ import VoiceCommands from "../components/voicecommand";
 const Home = () => {
   return (
     <>
+    <VoiceCommands
+          toggleContrast={() => document.body.classList.toggle("high-contrast")}
+          speakText={() => {
+            const content = document.querySelector("body").innerText;
+            const speech = new SpeechSynthesisUtterance(content);
+            speech.lang = "en-US";
+            window.speechSynthesis.speak(speech);
+          }}
+        />
       <Hero
         title={
           "Welcome to Rohith Medical Institute | Your Trusted Healthcare Provider"
@@ -19,15 +28,6 @@ const Home = () => {
       <Biography imageUrl={"/about.png"} />
       <Departments />
       <MessageForm />
-      <VoiceCommands
-          toggleContrast={() => document.body.classList.toggle("high-contrast")}
-          speakText={() => {
-            const content = document.querySelector("body").innerText;
-            const speech = new SpeechSynthesisUtterance(content);
-            speech.lang = "en-US";
-            window.speechSynthesis.speak(speech);
-          }}
-        />
     </>
   );
 };

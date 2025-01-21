@@ -5,12 +5,6 @@ import VoiceCommands from "../components/voicecommand";
 const AboutUs = () => {
   return (
     <>
-      <Hero
-        title={"Learn More About Us | Rohith Medical Institute"}
-        imageUrl={"/about.png"}
-      />
-      <Biography imageUrl={"/whoweare.png"} />
-      
      <VoiceCommands
           toggleContrast={() => document.body.classList.toggle("high-contrast")}
           speakText={() => {
@@ -20,6 +14,11 @@ const AboutUs = () => {
             window.speechSynthesis.speak(speech);
           }}
         />
+      <Hero
+        title={"Learn More About Us | Rohith Medical Institute"}
+        imageUrl={"/about.png"}
+      />
+      <Biography imageUrl={"/whoweare.png"} />
     </>
   );
 };

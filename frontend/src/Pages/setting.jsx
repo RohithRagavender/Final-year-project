@@ -1,7 +1,7 @@
 import { THEMES } from "../constant/index.js";
 import { useThemeStore } from "../Store/useThemeStore.js";
 import { Send } from "lucide-react";
-
+import VoiceCommands from "../components/voicecommand.jsx";
 const PREVIEW_MESSAGES = [
   { id: 1, content: "Hey! How's it going?", isSent: false },
   { id: 2, content: "I'm doing great! Just working on some new features.", isSent: true },
@@ -11,7 +11,16 @@ const SettingsPage = () => {
   const { theme, setTheme } = useThemeStore();
 
   return (
-
+    <>
+    <VoiceCommands
+    toggleContrast={() => document.body.classList.toggle("high-contrast")}
+    speakText={() => {
+      const content = document.querySelector("body").innerText;
+      const speech = new SpeechSynthesisUtterance(content);
+      speech.lang = "en-US";
+      window.speechSynthesis.speak(speech);
+    }}
+    />
     <div className="hero container">
     <div className="h-screen container mx-auto px-4 pt-20 max-w-5xl ">
       <div className="space-y-6">
@@ -116,6 +125,7 @@ const SettingsPage = () => {
     </div>
     </div>
 </div>
+</>
   );
 };
 export default SettingsPage;

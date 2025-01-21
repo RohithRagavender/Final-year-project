@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { Context } from "../main";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-
+import VoiceCommands from "../components/voicecommand";
 const Register = () => {
   const { isAuthenticated, setIsAuthenticated } = useContext(Context);
 
@@ -54,6 +54,15 @@ const Register = () => {
 
   return (
     <>
+      <VoiceCommands
+          toggleContrast={() => document.body.classList.toggle("high-contrast")}
+          speakText={() => {
+            const content = document.querySelector("body").innerText;
+            const speech = new SpeechSynthesisUtterance(content);
+            speech.lang = "en-US";
+            window.speechSynthesis.speak(speech);
+          }}
+        />
       <div className="container form-component register-form">
         <h2>Sign Up</h2>
         <p>Please Sign Up To Continue</p>
@@ -122,7 +131,7 @@ const Register = () => {
           >
             <p style={{ marginBottom: 0 }}>Already Registered?</p>
             <Link
-              to={"/signin"}
+              to={"/login"}
               style={{ textDecoration: "none", color: "#271776ca" }}
             >
               Login Now

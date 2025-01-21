@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../components/access.css";
-
+import VoiceCommands from "../components/voicecommand";
 function Access() {
 
   // Toggle High Contrast Mode
@@ -51,6 +51,15 @@ function Access() {
 
   return (
     <div className="hero container">
+        <VoiceCommands
+          toggleContrast={() => document.body.classList.toggle("high-contrast")}
+          speakText={() => {
+            const content = document.querySelector("body").innerText;
+            const speech = new SpeechSynthesisUtterance(content);
+            speech.lang = "en-US";
+            window.speechSynthesis.speak(speech);
+          }}
+        />
       <div>
         <header>
           <h1 id="pageTitle">Welcome to Medify Accessibility</h1>

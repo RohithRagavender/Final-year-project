@@ -5,13 +5,7 @@ import VoiceCommands from "../components/voicecommand";
 const Appointment = () => {
   return (
     <>
-    
-      <Hero
-        title={"Schedule Your Appointment | Rohith Medical Institute"}
-        imageUrl={"/signin.png"}
-      />
-      <AppointmentForm/>
-      <VoiceCommands
+     <VoiceCommands
           toggleContrast={() => document.body.classList.toggle("high-contrast")}
           speakText={() => {
             const content = document.querySelector("body").innerText;
@@ -20,6 +14,11 @@ const Appointment = () => {
             window.speechSynthesis.speak(speech);
           }}
         />
+      <Hero
+        title={"Schedule Your Appointment | Rohith Medical Institute"}
+        imageUrl={"/signin.png"}
+      />
+      <AppointmentForm/>
     </>
   );
 };

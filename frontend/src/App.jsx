@@ -15,11 +15,11 @@ import axios from "axios";
 import { Context } from "./main";
 import Login from "./Pages/Login";
 // import Chatbot from "./components/chatbot";
-import Access from "./Pages/Access";
 import SettingsPage from "./Pages/setting";
 import VoiceCommands from "./components/voicecommand";
 import "regenerator-runtime/runtime"; // Add this line at the top of your entry point
 import "@babel/polyfill"; // Add this line at the top of your entry point
+import BedAvailability from "./components/Bedavailable";
 
 
 
@@ -60,7 +60,7 @@ const App = () => {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/access" element={<Access />} />
+          <Route path="/access" element={<BedAvailability />} />
           <Route path="/voice" element={<VoiceCommands />} />
           <Route path="/setting" element={<SettingsPage />} />
         </Routes>

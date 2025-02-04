@@ -14,6 +14,7 @@ import AddNewAdmin from "./components/AddNewAdmin";
 import "./App.css";
 import { useThemeStore } from "./store/useThemeStore";
 import SettingsPage from "./components/settings";
+import BedManagement from "./components/AdminBedManagement";
 
 const App = () => {
   const { isAuthenticated, setIsAuthenticated, admin, setAdmin } =
@@ -49,6 +50,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/doctor/addnew" element={<AddNewDoctor />} />
         <Route path="/admin/addnew" element={<AddNewAdmin />} />
+        <Route path="/bed-management" element={<BedManagement />} /> 
         <Route path="/messages" element={<Messages />} />
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/settings" element={<SettingsPage />} />

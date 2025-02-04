@@ -31,6 +31,9 @@ import dialogflow from "@google-cloud/dialogflow";
 import path from "path";
 import { fileURLToPath } from "url";
 
+import bedRoutes from "./router/bedRouter.js";
+
+
 // Get the current file's directory using import.meta.url (for ES Modules)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,6 +45,8 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+
+app.use("/api/beds", bedRoutes);
 // Configure Middleware
 app.use(bodyParser.json());
 

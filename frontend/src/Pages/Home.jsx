@@ -6,7 +6,6 @@ import Departments from "../components/Departments";
 import "regenerator-runtime/runtime";
 import VoiceCommands from "../components/voicecommand";
 
-
 const Home = () => {
   return (
     <>

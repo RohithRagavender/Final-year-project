@@ -43,12 +43,12 @@ const Navbar = () => {
             <Link to={"/appointment"} onClick={() => setShow(!show)}>
               Appointment
             </Link>
-            <Link to={"/about"} onClick={() => setShow(!show)}>
-              About Us
-            </Link>
 
             <Link to={"/access"} onClick={() => setShow(!show)}>
-              Accessibility
+              BedAvailability
+            </Link>
+            <Link to={"/about"} onClick={() => setShow(!show)}>
+              About Us
             </Link>
             <Link to={"/setting"} onClick={() => setShow(!show)}>Setting</Link>
           </div>

@@ -11,19 +11,6 @@
 //   console.log(`Server listening at port ${process.env.PORT}`);
 // });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 import app from "./app.js"; // Import your existing Express app
 import cloudinary from "cloudinary";
 import bodyParser from "body-parser";

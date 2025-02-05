@@ -26,11 +26,13 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+  
 
+// For booking the bed
 router.put("/book/:bedNumber", async (req, res) => {
   try {
     const { bedNumber } = req.params;
-    const { patientName, admissionDate } = req.body;
+    const { patientName, date } = req.body;
 
     const bed = await Bed.findOne({ bedNumber });
 
@@ -44,7 +46,7 @@ router.put("/book/:bedNumber", async (req, res) => {
 
     bed.occupied = true;
     bed.patientName = patientName;
-    bed.admissionDate = admissionDate;
+    bed.date = new Date (date);
 
     await bed.save();
 
@@ -54,22 +56,53 @@ router.put("/book/:bedNumber", async (req, res) => {
   }
 });
 
+// for Delete the Bed in the Db
 router.delete("/:bedNumber", async (req, res) => {
   try {
     const { bedNumber } = req.params;
+    console.log(`🔔 Deleting bed: ${bedNumber}`);
 
     const deletedBed = await Bed.findOneAndDelete({ bedNumber });
 
     if (!deletedBed) {
+      console.log("🚫 Bed not found in database");
       return res.status(404).json({ message: "Bed not found" });
     }
 
-    res.status(200).json({ message: "Bed removed successfully!", deletedBed });
+    console.log("✅ Bed deleted successfully:", deletedBed);
+    res.status(200).json({ message: "Bed deleted successfully!", deletedBed });
   } catch (error) {
-    console.error("Error removing bed:", error);
+    console.error("❌ Error deleting bed:", error);
     res.status(500).json({ message: "Server Error" });
   }
 });
+
+
+// for free the bed 
+router.patch("/:bedNumber", async (req, res) => {
+  try {
+    const { bedNumber } = req.params;
+    console.log(`Received PATCH request for bedNumber: ${bedNumber}`);
+
+    const updatedBed = await Bed.findOneAndUpdate(
+      { bedNumber },
+      { $set: { bedNumber: bedNumber, occupied: false, patientId: null } },
+      { new: true }
+    );
+
+    if (!updatedBed) {
+      console.log("Bed not found");
+      return res.status(404).json({ message: "Bed not found" });
+    }
+
+    console.log("Bed updated successfully:", updatedBed);
+    res.status(200).json({ message: "Bed data removed successfully!", updatedBed });
+  } catch (error) {
+    console.error("Error updating bed:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 
 
 export default router;

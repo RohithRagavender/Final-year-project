@@ -1,83 +1,46 @@
-// import React, { useEffect } from "react";
-// import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
-
-// const VoiceCommands = ({ toggleContrast, speakText }) => {
-//   const { transcript, resetTranscript, listening } = useSpeechRecognition();
-
-//   useEffect(() => {
-//     if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-//       alert("Your browser does not support speech recognition.");
-//     }
-//   }, []);
-
-//   useEffect(() => {
-//     if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-//       return;
-//     }
-
-//     const command = transcript.toLowerCase();
-//     console.log("Transcript received:", command);
-
-//     if (command.includes("read")) {
-//       console.log("Executing command: read");
-//       speakText();
-//     } else if (command.includes("stop")) {
-//       console.log("Executing command: stop");
-//       if (listening) {
-//         SpeechRecognition.abortListening(); // Stop recognition
-//         console.log("Speech recognition stopped.");
-//       }
-//       window.speechSynthesis.cancel(); // Stop ongoing speech synthesis
-//       resetTranscript(); // Clear transcript
-//     } else if (command.includes("down")) {
-//       console.log("Executing command: scroll down");
-//       window.scrollBy(0, 200);
-//     } else if (command.includes("up")) {
-//       console.log("Executing command: scroll up");
-//       window.scrollBy(0, -200);
-//     } else {
-//       console.log("No matching command found.");
-//     }
-
-//     const resetDelay = setTimeout(() => resetTranscript(), 300);
-//     return () => clearTimeout(resetDelay);
-//   }, [transcript, toggleContrast, speakText, listening, resetTranscript]);
-
-//   return (
-//     <div className="flex flex-col items-center justify-center p-4 space-y-4 rounded-lg">
-//     <button
-//       onClick={() =>
-//         listening
-//           ? SpeechRecognition.abortListening() // Stop recognition
-//           : SpeechRecognition.startListening({ continuous: true })
-//       }
-//       className={`px-6 py-3 text-white font-semibold rounded-lg ${
-//         listening ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
-//       }`}
-//       aria-label="Start or stop voice commands"
-//     >
-//       {listening ? "Stop Voice Commands" : "Enable Voice Commands"}
-//     </button>
-//   </div>
-
-//   );
-// };
-
-// export default VoiceCommands;
-
-
-
-//Login with Voice Command 
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 const VoiceCommands = ({ toggleContrast, speakText, setFieldValue }) => {
   const { transcript, resetTranscript, listening } = useSpeechRecognition();
-  const [activeField, setActiveField] = useState(null); // Track which field is active
-  const navigate = useNavigate(); // React Router hook for navigation
+  const [activeField, setActiveField] = useState(null);
   const [spokenText, setSpokenText] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  // Memoized functions
+  const handleSetFieldValue = useCallback((fieldName, value) => {
+    setFieldValue(fieldName, value);
+  }, [setFieldValue]);
+
+  const handleSpeakText = useCallback(() => {
+    speakText();
+  }, [speakText]);
+
+  const handleToggleContrast = useCallback(() => {
+    toggleContrast();
+  }, [toggleContrast]);
+
+  const handleNavigation = useCallback((path) => {
+    navigate(path);
+    resetTranscript();
+  }, [navigate, resetTranscript]);
+
+  const sanitizeInput = useCallback((text) => {
+    return text.replace(/\.$/, "").trim();
+  }, []);
+
+  // Function to speak in a sweet female voice
+  const speakWithSweetVoice = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = speechSynthesis.getVoices().find(voice => voice.name.includes("Google UK English Female")) || speechSynthesis.getVoices()[0]; 
+    utterance.pitch = 1.3; 
+    utterance.rate = 1; 
+    speechSynthesis.speak(utterance);
+  };
 
   useEffect(() => {
     if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
@@ -85,7 +48,6 @@ const VoiceCommands = ({ toggleContrast, speakText, setFieldValue }) => {
       return;
     }
 
-    // Automatically start listening when the component mounts
     SpeechRecognition.startListening({ continuous: true });
   }, []);
 
@@ -95,10 +57,7 @@ const VoiceCommands = ({ toggleContrast, speakText, setFieldValue }) => {
     }
 
     const command = transcript.toLowerCase();
-    //console.log("Transcript received:", command);
 
-
-    // Command to select a field (email, password, confirm password)
     if (command.includes("enter email")) {
       setActiveField("email");
       resetTranscript();
@@ -110,103 +69,106 @@ const VoiceCommands = ({ toggleContrast, speakText, setFieldValue }) => {
       resetTranscript();
     }
 
-
-    // If the active field is selected, accumulate the spoken text
     if (activeField && command) {
-      setSpokenText(transcript); // Set spoken text to the current transcript
+      setSpokenText(transcript);
     }
-    // Fill the active field with the spoken text
-    // After a short delay, fill the field with the accumulated text
+
     const resetDelay = setTimeout(() => {
       if (spokenText.trim()) {
-        console.log(`Filling ${activeField} with: ${spokenText}`);
-        const sanitizedValue = command.replace(/[^a-zA-Z0-9@.-_ ]/g, ""); // Modify regex as needed to preserve more symbols
-        setFieldValue(activeField, sanitizedValue, spokenText.trim()); // Fill the field with the last sentence
-        setSpokenText(""); // Clear accumulated text after filling the field
-        setActiveField(null); // Reset active field
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance(`${activeField} filled successfully.`)); // Announce when the field is filled
-        // Announce the value entered in the field
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance(`${activeField} filled with value: ${spokenText.trim()}`)); // Announce the value
-
+        const sanitizedValue = sanitizeInput(spokenText);
+        handleSetFieldValue(activeField, sanitizedValue);
+        setSpokenText("");
+        setActiveField(null);
+        speakWithSweetVoice(`${activeField} filled with value: ${sanitizedValue}`);
       }
-    }, 1500);  // Wait for 1 second to detect when the user stops speaking
+    }, 1500);
 
-
-    // Handle "login" command to simulate the login button click
-    if (command.includes("login")) {
+    if (command.includes("login") && !isLoggedIn) {
       const loginButton = document.querySelector("button[type='submit']");
       if (loginButton) {
-        loginButton.click(); // Trigger click event on login button
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("Login button clicked.")); // Announce the action
+        loginButton.click();
+        setIsLoggedIn(true);
+        speakWithSweetVoice("Login button clicked.");
       }
       resetTranscript();
     }
 
-    // Clear field commands (optional)
     if (command.includes("clear email")) {
-      setFieldValue("email", "");
+      handleSetFieldValue("email", "");
       resetTranscript();
     } else if (command.includes("clear password")) {
-      setFieldValue("password", "");
+      handleSetFieldValue("password", "");
       resetTranscript();
     } else if (command.includes("clear confirm password")) {
-      setFieldValue("confirmPassword", "");
+      handleSetFieldValue("confirmPassword", "");
       resetTranscript();
     }
 
-
     if (command.includes("read")) {
-      //console.log("Executing command: read");
-      speakText();
+      handleSpeakText();
     } else if (command.includes("stop")) {
-      //console.log("Executing command: stop");
       if (listening) {
-        SpeechRecognition.abortListening(); // Stop recognition
-        //console.log("Speech recognition stopped.");
+        SpeechRecognition.abortListening();
       }
-      window.speechSynthesis.cancel(); // Stop ongoing speech synthesis
-      resetTranscript(); // Clear transcript
+      speechSynthesis.cancel();
+      resetTranscript();
 
-      // Restart speech recognition after a short delay
       setTimeout(() => {
-        //console.log("Restarting speech recognition...");
         SpeechRecognition.startListening({ continuous: true });
-      }, 500); // Restart after 500ms
+      }, 500);
     } else if (command.includes("down")) {
-      //console.log("Executing command: scroll down");
       window.scrollBy(0, 200);
     } else if (command.includes("up")) {
-      //console.log("Executing command: scroll up");
       window.scrollBy(0, -200);
     }
 
+    if (command.includes("home")) {
+      handleNavigation("/");
+    } else if (command.includes("appointment")) {
+      handleNavigation("/appointment");
+    } else if (command.includes("about us")) {
+      handleNavigation("/about");
+    } else if (command.includes("accessibility")) {
+      handleNavigation("/access");
+    } else if (command.includes("settings")) {
+      handleNavigation("/setting");
+    } else if (command.includes("register")) {
+      handleNavigation("/register");
+    } else if (command.includes("user")) {
+      handleNavigation("/login");
+    }
 
-      // Navigation commands
-      if (command.includes("home")) {
-        navigate("/"); // Navigate to Home
-      } else if (command.includes("appointment")) {
-        navigate("/appointment"); // Navigate to Appointment
-      } else if (command.includes("about us")) {
-        navigate("/about"); // Navigate to About Us
-      } else if (command.includes("accessibility")) {
-        navigate("/access"); // Navigate to Accessibility
-      } else if (command.includes("settings")) {
-        navigate("/setting"); // Navigate to Settings
-      } else if (command.includes("register")) {
-        navigate("/register"); // Navigate to Register
-      }else if(command.includes("login")){
-        navigate("/login");
-      }else if(command.includes("register")){
-        navigate("/register");
+    // **Logout Command**
+    if (command.includes("logout") && isLoggedIn) {
+      const logoutButton = document.querySelector("button.logout");
+      if (logoutButton) {
+        logoutButton.click();
+        setIsLoggedIn(false);
+        speakWithSweetVoice("Logout successful.");
       }
+      resetTranscript();
+    }
 
     return () => clearTimeout(resetDelay);
-  }, [transcript, toggleContrast, speakText, listening, resetTranscript, navigate]);
+  }, [
+    transcript,
+    activeField,
+    spokenText,
+    listening,
+    resetTranscript,
+    handleSetFieldValue,
+    handleSpeakText,
+    handleNavigation,
+    sanitizeInput,
+    isLoggedIn,
+  ]);
 
   return (
     <div className="flex flex-col items-center justify-center p-4 space-y-4 rounded-lg">
       <p className="text-gray-600">
-        {listening ? "Listening for voice commands..." : "Voice commands are inactive."}
+        {listening
+          ? "Listening for voice commands..."
+          : "Voice commands are inactive."}
       </p>
     </div>
   );
